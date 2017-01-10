@@ -11,7 +11,7 @@ Iremos creando sucesivas versiones añadiendo funcionalidad en cada una de ellas 
 
 Creación de la estructura del proyecto del Api.
 
-Blog Windows Platform Team en Geeks [Construyendo un Web Api I: Boiler Plate](http://geeks.ms/windowsplatform/?p=817&preview=true)
+Blog Windows Platform Team en Geeks [Construyendo un Web Api I: Boiler Plate](http://geeks.ms/windowsplatform/2017/01/11/construyendo-un-web-api-i/)
 
 Project [Boiler Plate](./00%20BoilerPlate/)
 
