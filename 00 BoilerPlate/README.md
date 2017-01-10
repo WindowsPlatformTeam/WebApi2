@@ -102,7 +102,7 @@ namespace Api
       public static void Configure(HttpConfiguration config)
       {
           config
-          .EnableSwagger(c =&amp;amp;amp;amp;amp;gt;
+          .EnableSwagger(c =>
           {
              c.SingleApiVersion("v1", Core.Constants.ApiName);
              c.Schemes(new[] { "http", "https" });
@@ -276,7 +276,7 @@ namespace Api.Core.Controllers
       [HttpGet]
       [ResponseType(typeof(bool))]
       [Route(Constants.GetTestBoolean)]
-      public async Task&amp;amp;amp;amp;amp;lt;IHttpActionResult&amp;amp;amp;amp;amp;gt; GetTestBoolean()
+      public async Task<IHttpActionResult> GetTestBoolean()
       {
          return Ok(true);
       }
@@ -284,7 +284,7 @@ namespace Api.Core.Controllers
       [HttpGet]
       [ResponseType(typeof(bool))]
       [Route(Constants.GetTestBooleanWithParam)]
-      public async Task&amp;amp;amp;amp;amp;lt;IHttpActionResult&amp;amp;amp;amp;amp;gt; GetTestBooleanWithParam(int id)
+      public async Task<IHttpActionResult> GetTestBooleanWithParam(int id)
       {
          return Ok(true);
       }
@@ -292,7 +292,7 @@ namespace Api.Core.Controllers
       [HttpPost]
       [ResponseType(typeof(bool))]
       [Route(Constants.PostTestBoolean)]
-      public async Task&amp;amp;amp;amp;amp;lt;IHttpActionResult&amp;amp;amp;amp;amp;gt; PostTestBoolean()
+      public async Task<IHttpActionResult> PostTestBoolean()
       {
          return Ok(true);
       }
@@ -411,3 +411,16 @@ public class MyObject
 public async Task<IHttpActionResult> GetTestBoolean(MyObject object)
 ```
   
+## Conclusiones
+
+Con este código tenemos la estructura básica para comenzar a trabajar con un Web Api. 
+Ahora estamos preparados para ir añadiendo funcionalidad. 
+Veremos que es sencillo ir dotando a nuestra Api de características que pueden ser muy interesantes en los siguientes post.
+
+## Referencias
+
+* ASP.NET Web Api: [https://msdn.microsoft.com/es-es/library/hh833994(v=vs.108).aspx](https://msdn.microsoft.com/es-es/library/hh833994(v=vs.108).aspx)
+* Owin: [http://owin.org/](http://owin.org/)
+* CORS: [https://developer.mozilla.org/es/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/es/docs/Web/HTTP/Access_control_CORS)
+* Inyección de dependencias: [http://anexsoft.com/p/97/ejemplo-de-inyeccion-de-dependencias-con-c](http://anexsoft.com/p/97/ejemplo-de-inyeccion-de-dependencias-con-c)
+* Swagger: [http://swagger.io/](http://swagger.io/)
