@@ -11,7 +11,7 @@ namespace Api.Core.Controllers
     {
         [HttpGet]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.GetTestBoolean, Constants.VersionDefault)]
+        [VersionedRoute(Constants.GetTestBoolean, VersionConstants.VersionDefault)]
         public async Task<IHttpActionResult> GetTestBoolean()
         {
             return await Task.FromResult(Ok(true));
@@ -19,7 +19,15 @@ namespace Api.Core.Controllers
 
         [HttpGet]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.GetTestBooleanWithParam, Constants.VersionDefault)]
+        [VersionedRoute(Constants.GetTestBoolean, 2)]
+        public async Task<IHttpActionResult> GetTestBoolean_V2()
+        {
+            return await Task.FromResult(Ok(false));
+        }
+
+        [HttpGet]
+        [ResponseType(typeof(bool))]
+        [VersionedRoute(Constants.GetTestBooleanWithParam, VersionConstants.VersionDefault)]
         public async Task<IHttpActionResult> GetTestBooleanWithParam(int id)
         {
             return await Task.FromResult(Ok(true));
@@ -27,7 +35,7 @@ namespace Api.Core.Controllers
 
         [HttpPost]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.PostTestBoolean, Constants.VersionDefault)]
+        [VersionedRoute(Constants.PostTestBoolean, VersionConstants.VersionDefault)]
         public async Task<IHttpActionResult> PostTestBoolean()
         {
             return await Task.FromResult(Ok(true));

@@ -11,7 +11,7 @@ namespace ApiTestRunner.Core.Controllers
     {
         [HttpGet]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.GetTest, VersionConstants.VersionDefault)]
+        [VersionedRoute(Constants.GetTest, 1)]
         public async Task<IHttpActionResult> GetTestBoolean()
         {
             return await Task.FromResult(Ok("This is version 1"));

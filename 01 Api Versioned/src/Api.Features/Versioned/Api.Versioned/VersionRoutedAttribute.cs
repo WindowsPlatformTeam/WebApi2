@@ -6,14 +6,14 @@ namespace Api.Versioned
     public class VersionedRoute : RouteFactoryAttribute
     {
         #region Fields
-        private readonly int allowedVersion;
+        private readonly int _allowedVersion;
         #endregion
 
         #region Constructor
         public VersionedRoute(string template, int allowedVersion)
             : base(template)
         {
-            this.allowedVersion = allowedVersion;
+            this._allowedVersion = allowedVersion;
         }
         #endregion
 
@@ -22,7 +22,7 @@ namespace Api.Versioned
         {
             get
             {
-                var constraints = new HttpRouteValueDictionary { { "version", new VersionConstraint(allowedVersion) } };
+                var constraints = new HttpRouteValueDictionary { { "version", new VersionConstraint(_allowedVersion) } };
                 return constraints;
             }
         }
