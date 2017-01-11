@@ -3,9 +3,11 @@
     "Tus clientes más descontentos son tu mayor fuente de aprendizaje" 
     --Bill Gates
 
-Proyectos antetiores: 
+Proyectos anteriores: 
 
-* [Construyendo un Web Api I: Starter](../00%20BoilerPlate/Readme)
+* [Construyendo un Web Api I: Starter](../00%20BoilerPlate)
+
+![Api Version](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/webapi.jpg)
 
 Para mí, el siguiente paso a dar al crear un API REST es versionarlo. El día de mañana no vamos a poder romper la estructura de nuestra API de golpe ya que nuestros clientes sufrirían un cambio catastrófico para ellos. Puede que existan algunos de los que incluso no se quieran actualizar y se mantengan en la versión anterior. Por ello esta vez vamos a versionar nuestra API.
 
@@ -50,7 +52,7 @@ El problema de este atributo Route es que no es suficiente, ya que si nuestra AP
 
 Para ello he creado en src una carpeta Api.Features e incluido en ella Versioned un proyecto llamado Api.Versioned sobre el que vamos a trabajar.
 
-![Api Versioned Project](./images/ProjectVersionedApi.PNG)
+![Api Versioned Project](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/ProjectVersionedApi.png)
 
 La primera clase que tenemos que crear es VersionRoutedAttribute, que va a implementar nuestra propia versión del Atributo Route:
 
@@ -353,15 +355,15 @@ Como ellos dicen en su propia Web: "Desarrolar APIs es difícil, Postman hace que
 
 Vamos a configurar la primera llamada al Api:
 
-![Llamada sin cabecera](./images/Postman_request1.png)
+![Llamada sin cabecera](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request1.png)
 
 La primera llamada sin cabeceras coge por defecto la versión 2, como está indicado en el webconfig. En cambio si añadimos la cabecera de que la versión que queremos es la 1:
 
-![Llamada con cabecera versión 1](./images/Postman_request2.png)
+![Llamada con cabecera versión 1](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request2.png)
 
 Poner la cabecera con la versión 2 del Api o sin ella es equivalente:
 
-![Llamada con cabecera versión 2](./images/Postman_request3.png)
+![Llamada con cabecera versión 2](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request3.png)
 
 Lo lógico es que la versión por defecto sea la 1 ya que en la primera versión puede no ser necesario añadir la cabecera. En cambio, al pasar a una versión posterior los clientes se tendrían que actualizar y para no romper sus llamadas, lo más lógico sería añadir esa cabecera a partir de la segunda versión, evolucionando así nuestra Api.
 
