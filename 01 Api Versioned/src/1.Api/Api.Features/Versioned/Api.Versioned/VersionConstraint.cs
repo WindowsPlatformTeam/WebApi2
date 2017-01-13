@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Api.Helpers.Contracts.ConfigurationManagerHelpers;
+using Api.Helpers.Core.ConfigurationManagerHelpers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Routing;
@@ -23,17 +25,22 @@ namespace Api.Versioned
             IDictionary<string, object> values, HttpRouteDirection routeDirection)
         {
             if (routeDirection != HttpRouteDirection.UriResolution) return false;
-            var version = GetVersionHeader(request) ?? VersionConstants.GetSettingOrDefaultValue<int>(VersionConstants.ConfVersionDefault);
+
+            IConfigurationManagerHelper configurationManagerHelper = request.GetDependencyScope().GetService(typeof(IConfigurationManagerHelper)) as IConfigurationManagerHelper;
+            if (configurationManagerHelper == null) configurationManagerHelper = new ConfigurationManagerHelper();
+
+            var version = GetVersionHeader(request, configurationManagerHelper) ?? configurationManagerHelper.GetSettingOrDefaultValue(VersionConstants.ConfVersionDefault, VersionConstants.VersionDefault);
             return version == allowedVersion;
         }
         #endregion
 
         #region Private Methods
-        private int? GetVersionHeader(HttpRequestMessage request)
+        private int? GetVersionHeader(HttpRequestMessage request, IConfigurationManagerHelper configurationManagerHelper)
         {
             string versionAsString;
             IEnumerable<string> headerValues;
-            if (request.Headers.TryGetValues(VersionConstants.GetSettingOrDefaultValue<string>(VersionConstants.ConfVersionHeader), out headerValues) && 
+            var headerApiVersion = configurationManagerHelper.GetSettingOrDefaultValue(VersionConstants.ConfVersionHeader, VersionConstants.VersionHeader);
+            if (request.Headers.TryGetValues(headerApiVersion, out headerValues) && 
                 headerValues.Count() == 1)
             {
                 versionAsString = headerValues.First();
