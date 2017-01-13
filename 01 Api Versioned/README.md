@@ -14,10 +14,54 @@ Para mí, el siguiente paso a dar al crear un API REST es versionarlo. El día de 
 El proceso de versionado es muy sencillo y veremos que no cuesta nada de trabajo actualizarlo. En este proyecto vamos a:
 
 * __Sobreescribir el atributo Route__ para incorporarle versionado.
-* Depurar con __Postman__ el resultado esperado.
 * Crear un __TestRunner__ para probar nuestros progresos. El TestRunner lo usaremos para probar las diferentes características, mientras que el proyecto principal ubicado en src lo dejaremos para poder cogerlo y reutilizarlo el día de mañana.
+* Depurar con __Postman__ el resultado esperado.
 
-## ASP.NET Web Api: Atributo Route
+## Versionado en API REST
+
+Existen varias maneras de versionar un Api:
+
+### Versionado en la URI 
+
+Explicitar el versionado en la ruta. Por ejemplo: 
+
+    .../maps/version/2
+    .../maps/version/2/buildings/version/3
+    .../maps/v2/buildings
+
+Desde mi punto de vista este versionado es demasiado invasivo en la url del Api. Al fin y al cabo la url es para indicar dónde se encuentra un recurso y una versión no tiene nada que ver con el recurso, por lo que conceptualmente no sería del todo correcto poner la versión aquí.
+
+### Parámetro en el Query String
+
+Pasar el parámetro de la versión por el query string:
+
+    .../maps/buildings?version=2
+
+Habría que mirar cada vez el parámetro que indica la versión. De nuevo el problema principal es conceptual, los parámetros deberían ser para pedir un recurso, no para poder pedir una versión.
+
+### Cabecera Accept
+
+La cabecera Accept es la que usa el cliente para pedir el tipo de los datos en que quieren que le lleguen. Normalmente un ejemplo de esta cabecera es:
+
+    Accept: application/json
+
+En esta cabecera podríamos pedir también la versión en la que queremos que nos vengan los datos. En este caso en formato _json_. Esta cabecera también se puede usar para poner una especificación creada por nosotros:
+
+    Accept: application/vnd.myapi.v2 + json
+
+_vnd_ indica que es una definición propia y con ello podemos en nuestra Api leer el dato y darle la versión correspondiente.
+
+Esta solución está cogida por pinzas, ya que cada cabecera debería tener un propósito y no mezclarlas.
+
+### Cabecera personalizada
+
+El protocolo HTTP permite poder crear cabeceras en las llamadas personalizadas, por lo que podemos crear nuestra propia cabecera:
+
+    api-version: 2
+
+Esta es la solución que a mí más me gusta y que implementaremos. Así, no mezclamos las cabeceras de Accept-Header ni invadimos los parámetros ni las urls. 
+
+# ASP.NET Web Api: Atributo Route
 
 Como vimos en el proyecto anterior, ASP.NET Web Api nos permite poder poner la ruta en cada uno de los métodos de nuestros Controladores:
 
@@ -106,6 +150,8 @@ config.Routes.MapHttpRoute(
 En el caso de DefaultApi la restricción es que el id sea un entero. Nosotros podemos crear nuestras propias restricciones cumpliendo el interfaz _IHttpRouteConstraint_, para ello implementaremos la clase VersionConstraint:
 
 ```csharp
+using Api.Helpers.Contracts.ConfigurationManagerHelpers;
+using Api.Helpers.Core.ConfigurationManagerHelpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -131,17 +177,22 @@ namespace Api.Versioned
             IDictionary<string, object> values, HttpRouteDirection routeDirection)
         {
             if (routeDirection != HttpRouteDirection.UriResolution) return false;
-            var version = GetVersionHeader(request) ?? VersionConstants.GetSettingOrDefaultValue<int>(VersionConstants.ConfVersionDefault);
+
+            IConfigurationManagerHelper configurationManagerHelper = request.GetDependencyScope().GetService(typeof(IConfigurationManagerHelper)) as IConfigurationManagerHelper;
+            if (configurationManagerHelper == null) configurationManagerHelper = new ConfigurationManagerHelper();
+
+            var version = GetVersionHeader(request, configurationManagerHelper) ?? configurationManagerHelper.GetSettingOrDefaultValue(VersionConstants.ConfVersionDefault, VersionConstants.VersionDefault);
             return version == allowedVersion;
         }
         #endregion
 
         #region Private Methods
-        private int? GetVersionHeader(HttpRequestMessage request)
+        private int? GetVersionHeader(HttpRequestMessage request, IConfigurationManagerHelper configurationManagerHelper)
         {
             string versionAsString;
             IEnumerable<string> headerValues;
-            if (request.Headers.TryGetValues(VersionConstants.GetSettingOrDefaultValue<string>(VersionConstants.ConfVersionHeader), out headerValues) && 
+            var headerApiVersion = configurationManagerHelper.GetSettingOrDefaultValue(VersionConstants.ConfVersionHeader, VersionConstants.VersionHeader);
+            if (request.Headers.TryGetValues(headerApiVersion, out headerValues) && 
                 headerValues.Count() == 1)
             {
                 versionAsString = headerValues.First();
@@ -170,65 +221,29 @@ La clave está en el método Match:
 * Si coinciden en la dirección entonces tendremos que comprobar que versión viene en la llamada. ¿Cómo viene la versión en la llamada? A mí me gusta poner una cabecera. Así, el método privado GetVersion va a buscar una cabecera cuyo nombre sea la que hemos definido en las constantes VersionConstants.
 * Si hay cabecera el valor se comparará con el valor del atributo que se les ha pasado. Si no hay cabecera se comparará con la versión por defecto de la API, es decir, si la API tiene un valor por defecto de 3 y queremos llamar a la versión 3 del api no hará falta que le pasemos ninguna cabecera con este 3. Esto normalmente se hace para no actualizar la versión 1 de las APIs y que se tengan que añadir cabeceras en versiones posteriores.
 
-En la clase estática VersionConstants he añadido un poco de azúcar sintáctico:
+En la clase estática VersionConstants tenemos los valores por defecto de la descripción de la cabecera (VersionHeader "api-header") y de la versión del api por defecto (VersionDefault 1) si no viene ninguna cabecera:
 
 ```csharp
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-
 namespace Api.Versioned
 {
     public static class VersionConstants
     {
-        static Dictionary<string, object> _defaultValues = new Dictionary<string, object>()
-        {
-            { ConfVersionHeader, VersionConstants.VersionHeader },
-            { ConfVersionDefault, VersionConstants.VersionDefault }
-        };
-
         //
         // Configuration Settings
         //
-        public const string ConfVersionHeader = "configuration:api-header";
+        public const string ConfVersionHeader = "configuration:api-version-header-description";
         public const string ConfVersionDefault = "configuration:api-version-default";
 
         //
         // Versioned Constants
         //
-        public const string VersionHeader = "api-header";
+        public const string VersionHeader = "api-version";
         public const int VersionDefault = 1;
-
-        public static T GetSettingOrDefaultValue<T>(string settingKey)
-        {
-            var configValue = ConfigurationManager.AppSettings[settingKey];
-
-            if (!string.IsNullOrWhiteSpace(configValue))
-            {
-                try
-                {
-                    return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(configValue);
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-
-            object value;
-
-            _defaultValues.TryGetValue(settingKey, out value);
-
-            if (value != null)
-                return (T)Convert.ChangeType(value, typeof(T));
-            throw new ConfigurationErrorsException($"Configuration not found: {settingKey}");
-        }
     }
 }
 ```
 
-El método GetSettingOrDefaultValue sirve para que cojamos los valores de VersionHeader ("api-header") y VersionDefault (1) por defecto; pero si queremos sobreescribirlos podemos poner un valor en el Web.config para sobreescribir estos parámetros. Veremos esta opción más adelante en el TestRunner.
+El Helper _ConfigurationManagerHelper_ usa los otros dos valores de __VersionConstants__ para que se puedan sobreescribir desde el WebConfig. Si en el Web Config hay un registro clave-valor sobreescribiendo el api-description o el api-version-default se cogerá ese valor en lugar del de _VersionConstants_ 
 
 Por último actualizamos el valor de nuestro controlador para dejarlo con el nuevo atributo:
 
@@ -279,7 +294,7 @@ namespace Api.Core.Controllers
 }
 ```
 
-## TestRunner Versionado
+# TestRunner Versionado
 
 Para poder testear la nueva funcionalidad vamos a crear una carpeta test/TestRunner con una copia de nuestra Api. Dentro vamos a poner un controlador con el nuevo atributo Versioned para poder probarlo:
 
@@ -367,13 +382,14 @@ Poner la cabecera con la versión 2 del Api o sin ella es equivalente:
 
 Lo lógico es que la versión por defecto sea la 1 ya que en la primera versión puede no ser necesario añadir la cabecera. En cambio, al pasar a una versión posterior los clientes se tendrían que actualizar y para no romper sus llamadas, lo más lógico sería añadir esa cabecera a partir de la segunda versión, evolucionando así nuestra Api.
 
-## Conclusiones
+# Conclusiones
 
 Versionar el Api es muy sencillo y nos puede ahorrar muchos quebraderos de cabeza en el futuro. Por ello, mejor ponerlo desde el principio para no causar problemas a las aplicaciones clientes que consuman nuestra Api en el futuro.
 
 Postman es una muy buena herramienta para depurar nuestras Apis y además tiene un interfaz muy fácil de usar y muy amigable.
 
-## Referencias
+# Referencias
 
+* Versionado en APIs REST: http://blog.restcase.com/restful-api-versioning-insights/
 * Atributo Route en ASP.NET Web Api 2: https://www.asp.net/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2
 * Postman: https://www.getpostman.com/
