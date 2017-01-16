@@ -9,12 +9,14 @@ Proyectos anteriores:
 
 ![Api Version](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/webapi.jpg)
 
-Para mí, el siguiente paso a dar al crear un API REST es versionarlo. El día de mañana no vamos a poder romper la estructura de nuestra API de golpe ya que nuestros clientes sufrirían un cambio catastrófico para ellos. Puede que existan algunos de los que incluso no se quieran actualizar y se mantengan en la versión anterior. Por ello esta vez vamos a versionar nuestra API.
+Para mí, el siguiente paso a dar al crear un API REST es versionarlo. El día de mañana no vamos a poder romper la estructura de nuestra API de golpe ya que nuestros clientes sufrirían un cambio catastrófico para ellos. Puede que existan algunos de los que incluso no se quieran actualizar y se mantengan en la versión anterior. Por ello, esta vez vamos a versionar nuestra API.
 
-El proceso de versionado es muy sencillo y veremos que no cuesta nada de trabajo actualizarlo. En este proyecto vamos a:
+El proceso de versionado es muy sencillo. Veremos que no cuesta nada de trabajo actualizarlo. 
+
+En este proyecto vamos a:
 
 * __Sobreescribir el atributo Route__ para incorporarle versionado.
-* Crear un __TestRunner__ para probar nuestros progresos. El TestRunner lo usaremos para probar las diferentes caracter�sticas, mientras que el proyecto principal ubicado en src lo dejaremos para poder cogerlo y reutilizarlo el día de mañana.
+* Crear un __TestRunner__ para probar nuestros progresos. El TestRunner lo usaremos para probar las diferentes características, mientras que el proyecto principal ubicado en src lo dejaremos para poder cogerlo y reutilizarlo el día de mañana.
 * Depurar con __Postman__ el resultado esperado.
 
 ## Versionado en API REST
@@ -29,7 +31,8 @@ Explicitar el versionado en la ruta. Por ejemplo:
     .../maps/version/2/buildings/version/3
     .../maps/v2/buildings
 
-Desde mi punto de vista este versionado es demasiado invasivo en la url del Api. Al fin y al cabo la url es para indicar dónde se encuentra un recurso y una versi�n no tiene nada que ver con el recurso, por lo que conceptualmente no sería del todo correcto poner la versión aquí.
+Desde mi punto de vista este versionado es demasiado invasivo en la url del Api. Al fin y al cabo, la url es para indicar dónde se encuentra un recurso. Una versión no tiene nada que ver con el recurso, por lo que conceptualmente no sería del todo correcto poner la versión aquí.
+Semánticamente no es muy correcto; pero eso sí es muy fácil de usar.
 
 ### Parámetro en el Query String
 
@@ -37,7 +40,7 @@ Pasar el parámetro de la versión por el query string:
 
     .../maps/buildings?version=2
 
-Habría que mirar cada vez el parámetro que indica la versión. De nuevo el problema principal es conceptual, los parámetros deberían ser para pedir un recurso, no para poder pedir una versión.
+Habría que mirar cada vez el parámetro que indica la versión. De nuevo el problema principal es semántico, los parámetros deberían ser para pedir un recurso, no para poder pedir una versión.
 
 ### Cabecera Accept
 
@@ -45,7 +48,7 @@ La cabecera Accept es la que usa el cliente para pedir el tipo de los datos en q
 
     Accept: application/json
 
-En esta cabecera podríamos pedir también la versión en la que queremos que nos vengan los datos. En este caso en formato _json_. Esta cabecera también se puede usar para poner una especificación creada por nosotros:
+En este caso el formato que se pide es el formato _json_.En esta cabecera podríamos pedir también la versión en la que queremos que nos vengan los datos en una especificación creada por nosotros:
 
     Accept: application/vnd.myapi.v2 + json
 
@@ -92,7 +95,7 @@ public class TestController : BaseController
 }
 ```
 
-El problema del atributo __Route__ es que no es suficiente. Si nuestra API evoluciona a una versión posterior después que nuestros clientes ya están en producción con una primera versión y los métodos cambian en nomenclatura, esto les afectaría en su funcionamiento. Por ello, debemos añadirle a cada una de estas funciones un nuevo parámetro que se corresponda con el número de la versión a la que pertenecen.
+El problema del atributo __Route__ es que no es suficiente. Si nuestra API evoluciona a una versión posterior después que nuestros clientes ya están en producción con una primera versión y los métodos cambian en nomenclatura, esto les afectaría en su funcionamiento. Por ello, debemos añadirle a cada una de estas funciones un nuevo parámetro que se corresponda con el número de la versión a la que pertenecen. Por tanto, nuestros _endpoints_ estarán formados por la __dirección__ y su __versión__.
 
 He creado en src una carpeta _Api.Features_ y he incluido en ella una carpeta _Versioned_ que contiene un proyecto llamado _Api.Versioned_ sobre el que vamos a trabajar.
 
@@ -250,7 +253,7 @@ namespace Api.Versioned
 }
 ```
 
-El Helper _ConfigurationManagerHelper_ usa los otros dos valores de _VersionConstants_ para que se puedan sobreescribir desde el WebConfig. Si en el Web Config hay un registro clave-valor sobreescribiendo el api-description o el api-version-default se cogerá ese valor en lugar del de _VersionConstants_ 
+El Helper _ConfigurationManagerHelper_ usa los otros dos valores de _VersionConstants_ para que se puedan sobreescribir desde el WebConfig. Si en el WebConfig hay un registro clave-valor sobreescribiendo el api-description o el api-version-default se cogerá ese valor en lugar del de _VersionConstants_. En caso contrario se usarán los valores por defectos definidos en dicha clase.
 
 ```csharp
 using Api.Helpers.Contracts.ConfigurationManagerHelpers;
@@ -286,7 +289,7 @@ namespace Api.Helpers.Core.ConfigurationManagerHelpers
 
 Esta clase puede ser reutilizada en alguna otra _Feature_ que coja valores del WebConfig. Por eso la he separado de la _Feature_ de versionado. La posible reutilización siempre es importante, [habla con tus objetos](http://geeks.ms/windowsplatform/2016/05/11/habla-con-tus-objetos/).
 
-Por último actualizamos nuestro controlador para dejarlo con el nuevo atributo:
+Por último, actualizamos nuestro controlador para dejarlo con el nuevo atributo:
 
 ```csharp
 using Api.Core.Controllers.Base;
