@@ -1,6 +1,6 @@
 # Construyendo un Web Api II: Versionado
 
-    "Tus clientes m·s descontentos son tu mayor fuente de aprendizaje" 
+    "Tus clientes m√°s descontentos son tu mayor fuente de aprendizaje" 
     --Bill Gates
 
 Proyectos anteriores: 
@@ -9,12 +9,12 @@ Proyectos anteriores:
 
 ![Api Version](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/webapi.jpg)
 
-Para mÌ, el siguiente paso a dar al crear un API REST es versionarlo. El dÌa de maÒana no vamos a poder romper la estructura de nuestra API de golpe ya que nuestros clientes sufrirÌan un cambio catastrÛfico para ellos. Puede que existan algunos de los que incluso no se quieran actualizar y se mantengan en la versiÛn anterior. Por ello esta vez vamos a versionar nuestra API.
+Para m√≠, el siguiente paso a dar al crear un API REST es versionarlo. El d√≠a de ma√±ana no vamos a poder romper la estructura de nuestra API de golpe ya que nuestros clientes sufrir√≠an un cambio catastr√≥fico para ellos. Puede que existan algunos de los que incluso no se quieran actualizar y se mantengan en la versi√≥n anterior. Por ello esta vez vamos a versionar nuestra API.
 
 El proceso de versionado es muy sencillo y veremos que no cuesta nada de trabajo actualizarlo. En este proyecto vamos a:
 
 * __Sobreescribir el atributo Route__ para incorporarle versionado.
-* Crear un __TestRunner__ para probar nuestros progresos. El TestRunner lo usaremos para probar las diferentes caracterÌsticas, mientras que el proyecto principal ubicado en src lo dejaremos para poder cogerlo y reutilizarlo el dÌa de maÒana.
+* Crear un __TestRunner__ para probar nuestros progresos. El TestRunner lo usaremos para probar las diferentes caracterÔøΩsticas, mientras que el proyecto principal ubicado en src lo dejaremos para poder cogerlo y reutilizarlo el d√≠a de ma√±ana.
 * Depurar con __Postman__ el resultado esperado.
 
 ## Versionado en API REST
@@ -29,15 +29,15 @@ Explicitar el versionado en la ruta. Por ejemplo:
     .../maps/version/2/buildings/version/3
     .../maps/v2/buildings
 
-Desde mi punto de vista este versionado es demasiado invasivo en la url del Api. Al fin y al cabo la url es para indicar dÛnde se encuentra un recurso y una versiÛn no tiene nada que ver con el recurso, por lo que conceptualmente no serÌa del todo correcto poner la versiÛn aquÌ.
+Desde mi punto de vista este versionado es demasiado invasivo en la url del Api. Al fin y al cabo la url es para indicar d√≥nde se encuentra un recurso y una versiÔøΩn no tiene nada que ver con el recurso, por lo que conceptualmente no ser√≠a del todo correcto poner la versi√≥n aqu√≠.
 
-### Par·metro en el Query String
+### Par√°metro en el Query String
 
-Pasar el par·metro de la versiÛn por el query string:
+Pasar el par√°metro de la versi√≥n por el query string:
 
     .../maps/buildings?version=2
 
-HabrÌa que mirar cada vez el par·metro que indica la versiÛn. De nuevo el problema principal es conceptual, los par·metros deberÌan ser para pedir un recurso, no para poder pedir una versiÛn.
+Habr√≠a que mirar cada vez el par√°metro que indica la versi√≥n. De nuevo el problema principal es conceptual, los par√°metros deber√≠an ser para pedir un recurso, no para poder pedir una versi√≥n.
 
 ### Cabecera Accept
 
@@ -45,13 +45,13 @@ La cabecera Accept es la que usa el cliente para pedir el tipo de los datos en q
 
     Accept: application/json
 
-En esta cabecera podrÌamos pedir tambiÈn la versiÛn en la que queremos que nos vengan los datos. En este caso en formato _json_. Esta cabecera tambiÈn se puede usar para poner una especificaciÛn creada por nosotros:
+En esta cabecera podr√≠amos pedir tambi√©n la versi√≥n en la que queremos que nos vengan los datos. En este caso en formato _json_. Esta cabecera tambi√©n se puede usar para poner una especificaci√≥n creada por nosotros:
 
     Accept: application/vnd.myapi.v2 + json
 
-_vnd_ indica que es una definiciÛn propia y con ello podemos en nuestra Api leer el dato y darle la versiÛn correspondiente.
+_vnd_ indica que es una definici√≥n propia y con ello podemos en nuestra Api leer el dato y darle la versi√≥n correspondiente.
 
-Esta soluciÛn est· cogida por pinzas, ya que cada cabecera deberÌa tener un propÛsito y no mezclarlas.
+Esta soluci√≥n est√° cogida por pinzas, ya que cada cabecera deber√≠a tener un prop√≥sito y no mezclarlas.
 
 ### Cabecera personalizada
 
@@ -59,11 +59,11 @@ El protocolo HTTP permite poder crear cabeceras en las llamadas personalizadas, 
 
     api-version: 2
 
-Esta es la soluciÛn que a mÌ m·s me gusta y que implementaremos. AsÌ, no mezclamos las cabeceras de Accept-Header ni invadimos los par·metros ni las urls. 
+Esta es la soluci√≥n que a m√≠ m√°s me gusta y que implementaremos. As√≠, no mezclamos las cabeceras de Accept-Header ni invadimos los par√°metros ni las urls. 
 
 # ASP.NET Web Api: Atributo Route
 
-Como vimos en el proyecto anterior, ASP.NET Web Api nos permite poder poner la ruta en cada uno de los mÈtodos de nuestros Controladores:
+Como vimos en el proyecto anterior, ASP.NET Web Api nos permite poder poner la ruta en cada uno de los m√©todos de nuestros Controladores:
 
 ```csharp
 public static class WebApiConfig
@@ -92,13 +92,15 @@ public class TestController : BaseController
 }
 ```
 
-El problema de este atributo Route es que no es suficiente, ya que si nuestra API evoluciona a una versiÛn posterior despuÈs que nuestros clientes ya estÈn en producciÛn con una primera versiÛn y los mÈtodos cambian en nomenclatura, esto les afectarÌa en su funcionamiento. Por ello debemos aÒadirle a cada una de estas funciones un nuevo par·metro que se corresponda con el n˙mero de la versiÛn a la que pertenecen.
+El problema del atributo __Route__ es que no es suficiente. Si nuestra API evoluciona a una versi√≥n posterior despu√©s que nuestros clientes ya est√°n en producci√≥n con una primera versi√≥n y los m√©todos cambian en nomenclatura, esto les afectar√≠a en su funcionamiento. Por ello, debemos a√±adirle a cada una de estas funciones un nuevo par√°metro que se corresponda con el n√∫mero de la versi√≥n a la que pertenecen.
 
-Para ello he creado en src una carpeta Api.Features e incluido en ella Versioned un proyecto llamado Api.Versioned sobre el que vamos a trabajar.
+He creado en src una carpeta _Api.Features_ y he incluido en ella una carpeta _Versioned_ que contiene un proyecto llamado _Api.Versioned_ sobre el que vamos a trabajar.
+
+Tambi√©n he a√±adido una carpeta Api.Helpers para ir incluyendo Helpers que podr√≠amos utilizar en cualquier _Feature_ que vayamos implementando en el futuro.
 
 ![Api Versioned Project](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/ProjectVersionedApi.png)
 
-La primera clase que tenemos que crear es VersionRoutedAttribute, que va a implementar nuestra propia versiÛn del Atributo Route:
+La primera clase que vamos a crear es _VersionRoutedAttribute_, que va a implementar nuestra propia versi√≥n del Atributo Route:
 
 ```csharp
 using System.Collections.Generic;
@@ -134,9 +136,14 @@ namespace Api.Versioned
 }
 ```
 
-El constructor del atributo recibir· dos par·metro, uno con la direcciÛn de la llamada -que le pasaremos a nuestra clase base RoutedAttribute para que se encargue de ella- y otro con la versiÛn de esa llamada. En el diccionario de restricciones le vamos a meter una restricciÛn personalizada que indique cu·l debe ser la versiÛn correcta.
+El constructor del atributo recibir√° dos par√°metros: 
 
-En el proyecto anterior vimos como las rutas podÌan especificarse poniendo valores por defecto y restricciones:
+* Uno con la __direcci√≥n de la llamada__, que le pasaremos a nuestra clase base RoutedAttribute para que se encargue de ella. 
+* Otro con la __versi√≥n__ de esa llamada. 
+
+En el diccionario de restricciones vamos a a√±adir una restricci√≥n personalizada que indique cu√°l debe ser la versi√≥n correcta.
+
+En el proyecto anterior vimos como las rutas pod√≠an especificarse poniendo valores por defecto y restricciones:
 
 ```csharp
 config.Routes.MapHttpRoute(
@@ -147,7 +154,7 @@ config.Routes.MapHttpRoute(
 );
 ```
 
-En el caso de DefaultApi la restricciÛn es que el id sea un entero. Nosotros podemos crear nuestras propias restricciones cumpliendo el interfaz _IHttpRouteConstraint_, para ello implementaremos la clase VersionConstraint:
+En el caso de DefaultApi la restricci√≥n es que el id sea un entero. Nosotros podemos crear nuestras propias restricciones cumpliendo el interfaz _IHttpRouteConstraint_. La clase VersionConstraint tendr√° ese objetivo:
 
 ```csharp
 using Api.Helpers.Contracts.ConfigurationManagerHelpers;
@@ -215,13 +222,13 @@ namespace Api.Versioned
 }
 ```
 
-La clave est· en el mÈtodo Match: 
+La clave est√° en el m√©todo Match: 
 
-* Primero comprobamos si la direcciÛn es la misma que tenemos establecida, si no es asÌ devolvemos false ya que no es el mÈtodo correcto. 
-* Si coinciden en la direcciÛn entonces tendremos que comprobar que versiÛn viene en la llamada. øCÛmo viene la versiÛn en la llamada? A mÌ me gusta poner una cabecera. AsÌ, el mÈtodo privado GetVersion va a buscar una cabecera cuyo nombre sea la que hemos definido en las constantes VersionConstants.
-* Si hay cabecera el valor se comparar· con el valor del atributo que se les ha pasado. Si no hay cabecera se comparar· con la versiÛn por defecto de la API, es decir, si la API tiene un valor por defecto de 3 y queremos llamar a la versiÛn 3 del api no har· falta que le pasemos ninguna cabecera con este 3. Esto normalmente se hace para no actualizar la versiÛn 1 de las APIs y que se tengan que aÒadir cabeceras en versiones posteriores.
+* Primero comprobamos si la direcci√≥n es la misma que tenemos establecida, si no es as√≠ devolvemos false ya que no es el m√©todo correcto. 
+* Si coinciden en la direcci√≥n entonces tendremos que comprobar que versi√≥n viene en la llamada. Este ser√≠a el punto d√≥nde tenemos que decidir lo visto en la parte del versionado de las APIs. Del par√°metro _Request_ podr√≠amos sacar cualquier tipo de informaci√≥n de la llamada. A m√≠ me gusta poner una cabecera personalizada ya que deja la llamada m√°s limpia. El m√©todo privado _GetVersion_ va a buscar una cabecera cuyo nombre sea la que hemos definido en las constantes _VersionConstants_.
+* Si hay cabecera el valor se comparar√° con el valor del atributo que se les ha pasado. Si no hay cabecera se comparar√° con la versi√≥n por defecto de la API, es decir, si la API tiene un valor por defecto de 3 y queremos llamar a la versi√≥n 3 del API no har√° falta que le pasemos ninguna cabecera con este 3. Esto normalmente se hace para no actualizar la versi√≥n 1 de las APIs y que se tengan que a√±adir cabeceras en versiones posteriores, para no tocar los clientes que ya usan la versi√≥n 1.
 
-En la clase est·tica VersionConstants tenemos los valores por defecto de la descripciÛn de la cabecera (VersionHeader "api-header") y de la versiÛn del api por defecto (VersionDefault 1) si no viene ninguna cabecera:
+En la clase est√°tica _VersionConstants_ tenemos los valores por defecto de la descripci√≥n de la cabecera (VersionHeader "api-header") y de la versi√≥n de la API por defecto (VersionDefault 1) si no viene ninguna cabecera:
 
 ```csharp
 namespace Api.Versioned
@@ -243,9 +250,43 @@ namespace Api.Versioned
 }
 ```
 
-El Helper _ConfigurationManagerHelper_ usa los otros dos valores de __VersionConstants__ para que se puedan sobreescribir desde el WebConfig. Si en el Web Config hay un registro clave-valor sobreescribiendo el api-description o el api-version-default se coger· ese valor en lugar del de _VersionConstants_ 
+El Helper _ConfigurationManagerHelper_ usa los otros dos valores de _VersionConstants_ para que se puedan sobreescribir desde el WebConfig. Si en el Web Config hay un registro clave-valor sobreescribiendo el api-description o el api-version-default se coger√° ese valor en lugar del de _VersionConstants_ 
 
-Por ˙ltimo actualizamos el valor de nuestro controlador para dejarlo con el nuevo atributo:
+```csharp
+using Api.Helpers.Contracts.ConfigurationManagerHelpers;
+using System;
+using System.ComponentModel;
+using System.Configuration;
+
+namespace Api.Helpers.Core.ConfigurationManagerHelpers
+{
+    public class ConfigurationManagerHelper : IConfigurationManagerHelper
+    {
+        public T GetSettingOrDefaultValue<T>(string settingKey, T defaultValue)
+        {
+            var configValue = ConfigurationManager.AppSettings[settingKey];
+
+            if (!string.IsNullOrWhiteSpace(configValue))
+            {
+                try
+                {
+                    return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(configValue);
+                }
+                catch (Exception e)
+                {
+                    throw new ConfigurationErrorsException($"Configuration error: {settingKey}", e);
+                }
+            }
+
+            return defaultValue;
+        }
+    }
+}
+```
+
+Esta clase puede ser reutilizada en alguna otra _Feature_ que coja valores del WebConfig. Por eso la he separado de la _Feature_ de versionado. La posible reutilizaci√≥n siempre es importante, [habla con tus objetos](http://geeks.ms/windowsplatform/2016/05/11/habla-con-tus-objetos/).
+
+Por √∫ltimo actualizamos nuestro controlador para dejarlo con el nuevo atributo:
 
 ```csharp
 using Api.Core.Controllers.Base;
@@ -261,7 +302,7 @@ namespace Api.Core.Controllers
     {
         [HttpGet]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.GetTestBoolean, VersionConstants.VersionDefault)]
+*       [VersionedRoute(Constants.GetTestBoolean, VersionConstants.VersionDefault)]
         public async Task<IHttpActionResult> GetTestBoolean()
         {
             return await Task.FromResult(Ok(true));
@@ -269,7 +310,7 @@ namespace Api.Core.Controllers
 
         [HttpGet]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.GetTestBoolean, 2)]
+*       [VersionedRoute(Constants.GetTestBoolean, 2)]
         public async Task<IHttpActionResult> GetTestBoolean_V2()
         {
             return await Task.FromResult(Ok(false));
@@ -277,7 +318,7 @@ namespace Api.Core.Controllers
 
         [HttpGet]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.GetTestBooleanWithParam, VersionConstants.VersionDefault)]
+*       [VersionedRoute(Constants.GetTestBooleanWithParam, VersionConstants.VersionDefault)]
         public async Task<IHttpActionResult> GetTestBooleanWithParam(int id)
         {
             return await Task.FromResult(Ok(true));
@@ -285,7 +326,7 @@ namespace Api.Core.Controllers
 
         [HttpPost]
         [ResponseType(typeof(bool))]
-        [VersionedRoute(Constants.PostTestBoolean, VersionConstants.VersionDefault)]
+*       [VersionedRoute(Constants.PostTestBoolean, VersionConstants.VersionDefault)]
         public async Task<IHttpActionResult> PostTestBoolean()
         {
             return await Task.FromResult(Ok(true));
@@ -344,7 +385,7 @@ namespace ApiTestRunner.Core.Controllers
 }
 ```
 
-En el webconfig de la aplicaciÛn he aÒadido una lÌnea para poner la versiÛn 2 por defecto:
+En el webconfig de la aplicaci√≥n he a√±adido una l√≠nea para poner la versi√≥n 2 por defecto:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -362,31 +403,35 @@ En el webconfig de la aplicaciÛn he aÒadido una lÌnea para poner la versiÛn 2 po
 </configuration>
 ```
 
-Para probar el Api voy a usar _Postman_. Postman es una herramienta creada por Google que podÈis descargar aquÌ: https://www.getpostman.com/
+Para probar el Api voy a usar _Postman_. Postman es una herramienta creada por Google que pod√©is descargar aqu√≠: https://www.getpostman.com/
 
 ![Postman](http://blog.getpostman.com/wp-content/uploads/2014/07/logo.png)
 
-Como ellos dicen en su propia Web: "Desarrolar APIs es difÌcil, Postman hace que sea m·s f·cil". Para testear nuestros resultados es una herramienta muy potente ya que nos permite manejar las llamadas de un Api y meter cabeceras en la misma de manera muy sencilla.
+Como ellos dicen en su propia Web: "Desarrolar APIs es dif√≠cil, Postman hace que sea m√°s f√°cil". Para testear nuestros resultados es una herramienta muy potente ya que nos permite manejar las llamadas de una API y meter cabeceras en la misma de manera muy sencilla.
 
 Vamos a configurar la primera llamada al Api:
 
 ![Llamada sin cabecera](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request1.png)
 
-La primera llamada sin cabeceras coge por defecto la versiÛn 2, como est· indicado en el webconfig. En cambio si aÒadimos la cabecera de que la versiÛn que queremos es la 1:
+La primera llamada sin cabeceras recibe por defecto la versi√≥n 2, como est√° indicado en el webconfig. En cambio si a√±adimos la cabecera de que la versi√≥n que queremos es la 1:
 
-![Llamada con cabecera versiÛn 1](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request2.png)
+![Llamada con cabecera versi√≥n 1](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request2.png)
 
-Poner la cabecera con la versiÛn 2 del Api o sin ella es equivalente:
+Poner la cabecera con la versi√≥n 2 del Api o sin ella es equivalente:
 
-![Llamada con cabecera versiÛn 2](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request3.png)
+![Llamada con cabecera versi√≥n 2](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request3.png)
 
-Lo lÛgico es que la versiÛn por defecto sea la 1 ya que en la primera versiÛn puede no ser necesario aÒadir la cabecera. En cambio, al pasar a una versiÛn posterior los clientes se tendrÌan que actualizar y para no romper sus llamadas, lo m·s lÛgico serÌa aÒadir esa cabecera a partir de la segunda versiÛn, evolucionando asÌ nuestra Api.
+Lo l√≥gico es que la versi√≥n por defecto sea la 1 ya que en la primera versi√≥n puede no ser necesario a√±adir la cabecera. En cambio, al pasar a una versi√≥n posterior los clientes se tendr√≠an que actualizar. Para no romper sus llamadas, lo m√°s l√≥gico ser√≠a a√±adir esa cabecera a partir de la segunda versi√≥n, evolucionando as√≠ nuestra API.
+
+Si hacemos la llamadas con la cabecera con valor versi√≥n 3, el NotFoundController visto en el proyecto anterior entra en escena y nos devuelve un error 404, ya que para esa versi√≥n la url no existe:
+
+![Llamada con cabecera versi√≥n 2](http://geeks.ms/windowsplatform/wp-content/uploads/sites/266/2017/01/Postman_request4.png)
 
 # Conclusiones
 
 Versionar el Api es muy sencillo y nos puede ahorrar muchos quebraderos de cabeza en el futuro. Por ello, mejor ponerlo desde el principio para no causar problemas a las aplicaciones clientes que consuman nuestra Api en el futuro.
 
-Postman es una muy buena herramienta para depurar nuestras Apis y adem·s tiene un interfaz muy f·cil de usar y muy amigable.
+Postman es una muy buena herramienta para depurar nuestras Apis y adem√°s tiene un interfaz muy f√°cil de usar y muy amigable.
 
 # Referencias
 
