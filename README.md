@@ -19,6 +19,6 @@ Project [Boiler Plate](./00%20BoilerPlate/)
 
 Creación de un proyecto en Api.Features para poder meter versionado en las urls de nuestra API.
 
-Blog Windows Platform Team en Geeks [Construyendo un Web Api II: Versionado](http://geeks.ms/windowsplatform/2017/01/11/construyendo-un-web-api-i/)
+Blog Windows Platform Team en Geeks [Construyendo un Web Api II: Versionado](https://geeks.ms/windowsplatform/2017/02/17/construyendo-un-web-api-ii-versionado/)
 
 Project [Versioned](./01%20Api%20Versioned/)
